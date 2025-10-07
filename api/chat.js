@@ -34,7 +34,7 @@ export async function POST(request) {
     globalThis.userUsage[ip].count++;
 
     // ✅ 하루 50회 제한 (원하면 10회나 100회로 변경 가능)
-    if (globalThis.userUsage[ip].count > 1) {
+    if (globalThis.userUsage[ip].count > 50) {
       return new Response(
         JSON.stringify({ reply: "⚠️ 오늘은 대화 한도를 초과했어. 내일 다시 와줘." }),
         { status: 429, headers: { "Content-Type": "application/json", ...cors } }
