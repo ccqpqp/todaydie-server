@@ -1,4 +1,17 @@
+import express from "express";
+import cors from "cors";
 import OpenAI from "openai";
+
+const app = express();
+
+// ✅ CORS 완전 허용 (이게 핵심)
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
+
+app.use(express.json());
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
