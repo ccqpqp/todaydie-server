@@ -45,9 +45,7 @@ app.post("/api/chat", async (req, res) => {
 
 // ✅ 포트 설정
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`✅ Server running on port ${PORT}`)
-);
 
 // ✅ Vercel용 export (중요!)
 export default app;
+
