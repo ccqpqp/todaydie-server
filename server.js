@@ -2,6 +2,11 @@ import express from "express";
 import cors from "cors";
 import OpenAI from "openai";
 
+app.get("/", (req, res) => {
+  res.send("✅ TodayDie 서버가 정상적으로 작동 중입니다!");
+});
+
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -33,4 +38,5 @@ app.post("/api/chat", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
 
