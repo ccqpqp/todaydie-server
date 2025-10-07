@@ -1,41 +1,42 @@
-import express from "express";
-import cors from "cors";
+// api/chat.js  (Vercel Functions: Node.js Runtime, Express 불필요)
 import OpenAI from "openai";
 
-const app = express();
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ✅ CORS 완전 허용 (이게 핵심)
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
+// 공통 CORS 헤더
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
-app.use(express.json());
+// 사전요청(OPTIONS) 허용
+export function OPTIONS() {
+  return new Response(null, { status: 204, headers: cors });
+}
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
+// 채팅 POST
+export async function POST(request) {
   try {
-    const { message } = req.body;
+    const { message } = await request.json();
+
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "너는 '검알'이라는 감정 파트너야. 따뜻하고 짧게 대답해." },
-        { role: "user", content: message },
+        { role: "system", content: "너는 '검알'이라는 감정 파트너야. 따뜻하고 짧게, 인간적으로 대답해." },
+        { role: "user", content: message ?? "" },
       ],
     });
 
-    const reply = completion.choices?.[0]?.message?.content || "";
-    res.status(200).json({ reply });
+    const reply = completion.choices?.[0]?.message?.content ?? "";
+    return new Response(JSON.stringify({ reply }), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...cors },
+    });
   } catch (err) {
-    console.error("❌ 오류:", err);
-    res.status(500).json({ error: err.message });
+    return new Response(JSON.stringify({ error: String(err?.message || err) }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...cors },
+    });
   }
 }
